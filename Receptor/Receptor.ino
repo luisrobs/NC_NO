@@ -11,56 +11,50 @@
 #define NETWORKID     100  //the same on all nodes that talk to each other
 #define FREQUENCY     RF69_433MHZ
 #define ENCRYPTKEY    "sampleEncryptKey" //exactly the same 16 characters/bytes on all nodes!
-#define ACK_TIME      30 // max # of ms to wait for an ack
-#define SERIAL_BAUD   115200
-#define LED           9 // Moteinos have LEDs on D9
+
+//#define DEBUG
 
 RFM69 radio;
 char message[8];
 
 void setup() {
-  //Serial.begin(SERIAL_BAUD);
+  
+  //Radio Settings
   radio.initialize(FREQUENCY,NODEID,NETWORKID);
   radio.setHighPower();
   radio.encrypt(ENCRYPTKEY);
   radio.promiscuous(true);
-  /*char buff[50];
-  sprintf(buff, "\nListening at %d Mhz...", FREQUENCY==RF69_433MHZ ? 433 : FREQUENCY==RF69_868MHZ ? 868 : 915);
-  Serial.println(buff);*/
+  
+  //Output Settings
   pinMode(3, OUTPUT);
   pinMode(4, OUTPUT);
   pinMode(5,OUTPUT);
+  
+  #ifdef DEBUG
+  Serial.begin(115200);
+  Serial.println("\nListening...");  
+  #endif
 }
-
-byte ackCount=0;
-uint32_t packetCount = 0;
 
 void loop() {
 
   if (radio.receiveDone())
   {
-    /*Serial.print("#[");
-    Serial.print(++packetCount);
-    Serial.print(']');
-    Serial.print('[');Serial.print(radio.SENDERID, DEC);Serial.print("] ");*/
+    #ifdef DEBUG
+    Serial.print("ID:[");Serial.print(radio.SENDERID, DEC);Serial.print("]-MSG:[");
+    #endif
 
     for (byte i = 0; i < radio.DATALEN; i++){
       message[i] = (char)radio.DATA[i];
-      //Serial.print(message[i]);
+      
+      #ifdef DEBUG
+      Serial.print(message[i]);
+      #endif
     }
-    //Serial.print("   [RX_RSSI:");Serial.print(radio.RSSI);Serial.print("]");
     
-    
-    if (radio.ACKRequested())
-    {
-      byte theNodeID = radio.SENDERID;
-      radio.sendACK();
-      //Serial.print(" - ACK sent.");                
-    }
-    //Serial.println();
-    
-    /*Serial.print("Message[0]=");
-    Serial.println(message[0]);*/
+    #ifdef DEBUG
+    Serial.print("]-[RX_RSSI:");Serial.print(radio.RSSI);Serial.println("]");
+    #endif
     
     if(radio.SENDERID == 2){
       if(message[0] == 'c') digitalWrite(3, HIGH);
