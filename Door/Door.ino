@@ -31,8 +31,8 @@ RFM69 radio;
 void wakeUp()
 {
   // Just a handler for the pin interrupt.
-  Serial.println("INT");
-  Serial.flush();
+//  Serial.println("INT");
+  //Serial.flush();
   
   //digitalWrite(LED, pin);
   
@@ -42,68 +42,48 @@ void wakeUp()
   //sendPackage();
   
   //door = digitalRead(7);
-  if(digitalRead(3)) paquete= 'c';
-  else paquete = 'o';
+  if(digitalRead(3)){
+    paquete= 'c';
+    digitalWrite(LED, HIGH);
+  }
+  else{
+    paquete = 'o';
+    digitalWrite(LED, LOW);
+  }
   
-  //radio.sendWithRetry(GATEWAYID, &paquete, sizeof(paquete));
+  radio.sendWithRetry(GATEWAYID, &paquete, sizeof(paquete));
   
-  if (radio.sendWithRetry(GATEWAYID, &paquete, sizeof(paquete)))
+  /*if (radio.sendWithRetry(GATEWAYID, &paquete, sizeof(paquete)))
     Serial.print(" ok!");
   else Serial.print(" nothing...");
   
   Serial.print("Door: ");
-  Serial.println(paquete);
+  Serial.println(paquete);*/
 
 }
 
 void setup(){
   
-  //pinMode(LED, OUTPUT);
+  pinMode(LED, OUTPUT);
   pinMode(wakeUpPin, INPUT); 
   
-  Serial.begin(SERIAL_BAUD);
+  //Serial.begin(SERIAL_BAUD);
   radio.initialize(FREQUENCY,NODEID,NETWORKID);
   radio.setHighPower();
   radio.encrypt(ENCRYPTKEY);
     
-  Serial.println("Starting...");
-  Serial.flush();
+  //Serial.println("Starting...");
+  //Serial.flush();
 }
 
 void loop() {
   
-  // Allow wake up pin to trigger interrupt on low.
+  // Allow wake up pin to trigger interrupt on change.
     attachInterrupt(1, wakeUp, CHANGE);
     // Enter power down state with ADC and BOD module disabled.
     // Wake up when wake up pin is changing.
-    Serial.flush();
+    //Serial.flush();
     LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF); 
     // Disable external pin interrupt on wake up pin.
-    detachInterrupt(1); 
-    // Do something here
-    // Example: Read sensor, data logging, data transmission.
-
+    detachInterrupt(1);
 }
-
-/*void sendPackage(){
-  
-  //delay(10);
-  door = digitalRead(7);
-  
-  if(door) paquete= 'c';
-  else paquete = 'o';
-  
-  Serial.print("Door: ");
-  Serial.println(door);
-    
-  Serial.print("Sending[");
-  Serial.print(sendSize);
-  Serial.print("]: ");
-  radio.sendWithRetry(GATEWAYID, &paquete, sizeof(paquete));
-  //if (radio.sendWithRetry(GATEWAYID, &paquete, sizeof(paquete)))
-   //Serial.print(" ok!");
-  //else Serial.print(" nothing...");
-  
-  //Serial.println();
-  
-}*/
