@@ -23,14 +23,18 @@ void setup() {
   radio.initialize(FREQUENCY,NODEID,NETWORKID);
   radio.setHighPower();
   radio.encrypt(ENCRYPTKEY);
+  radio.promiscuous(true);
   /*char buff[50];
   sprintf(buff, "\nListening at %d Mhz...", FREQUENCY==RF69_433MHZ ? 433 : FREQUENCY==RF69_868MHZ ? 868 : 915);
   Serial.println(buff);*/
-  pinMode(9, OUTPUT);
+  pinMode(3, OUTPUT);
+  pinMode(4, OUTPUT);
+  pinMode(5,OUTPUT);
 }
 
 byte ackCount=0;
 uint32_t packetCount = 0;
+
 void loop() {
 
   if (radio.receiveDone())
@@ -58,7 +62,19 @@ void loop() {
     /*Serial.print("Message[0]=");
     Serial.println(message[0]);*/
     
-    if(message[0] == 'c') digitalWrite(9, HIGH);
-    else digitalWrite(9, LOW);
-  } 
+    if(radio.SENDERID == 2){
+      if(message[0] == 'c') digitalWrite(3, HIGH);
+      else if(message[0] == 'o') digitalWrite(3, LOW);
+    }
+    
+    if(radio.SENDERID == 4){
+      if(message[0] == 'c') digitalWrite(4, HIGH);
+      else if(message[0] == 'o') digitalWrite(4, LOW);
+    }
+    
+    if(radio.SENDERID == 6){
+    if(message[0] == 'c') digitalWrite(5, HIGH);
+    else if(message[0] == 'o') digitalWrite(5, LOW);
+    }
+  }
 }

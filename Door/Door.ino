@@ -39,19 +39,19 @@ void wakeUp()
   //if(pin) pin=0;
   //else pin = 1;
   
-  //sendPackage();
-  
   //door = digitalRead(7);
   if(digitalRead(3)){
     paquete= 'c';
-    digitalWrite(LED, HIGH);
+    //digitalWrite(LED, HIGH);
   }
   else{
     paquete = 'o';
-    digitalWrite(LED, LOW);
+    //digitalWrite(LED, LOW);
   }
   
-  radio.sendWithRetry(GATEWAYID, &paquete, sizeof(paquete));
+  radio.send(GATEWAYID, &paquete, sizeof(paquete), false);
+  radio.sleep();
+  //radio.sendWithRetry(GATEWAYID, &paquete, sizeof(paquete), 3, 30);
   
   /*if (radio.sendWithRetry(GATEWAYID, &paquete, sizeof(paquete)))
     Serial.print(" ok!");
@@ -64,13 +64,14 @@ void wakeUp()
 
 void setup(){
   
-  pinMode(LED, OUTPUT);
+  //pinMode(LED, OUTPUT);
   pinMode(wakeUpPin, INPUT); 
   
   //Serial.begin(SERIAL_BAUD);
   radio.initialize(FREQUENCY,NODEID,NETWORKID);
   radio.setHighPower();
   radio.encrypt(ENCRYPTKEY);
+  radio.sleep();
     
   //Serial.println("Starting...");
   //Serial.flush();
